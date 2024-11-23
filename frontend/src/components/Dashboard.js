@@ -140,35 +140,22 @@ function Dashboard() {
         // Check if token exists
         const token = localStorage.getItem('accessToken');
         if (!token) {
-          setError('You are not logged in. Please log in to view the dashboard.');
           navigate('/login');
           return;
         }
 
-        // Make the API request
-        const response = await api.get('/expenses/dashboard_stats/');
-        console.log('Dashboard data received:', response.data);
-        setDashboardData(response.data);
+        const response = await api.get('/api/expenses/dashboard/');
+        if (response.data) {
+          setDashboardData(response.data);
+        }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
-        
-        // Handle different types of errors
-        if (error.response) {
-          // Server responded with an error
-          if (error.response.status === 401) {
-            setError('Your session has expired. Please log in again.');
-            navigate('/login');
-          } else if (error.response.status === 500) {
-            setError(`Server error: ${error.response.data.details || 'Failed to load dashboard data'}`);
-          } else {
-            setError(`Error: ${error.response.data.error || 'Failed to load dashboard data'}`);
-          }
-        } else if (error.request) {
-          // Request was made but no response received
-          setError('Could not connect to the server. Please check your internet connection.');
+        if (error.response?.status === 401) {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          navigate('/login');
         } else {
-          // Something else went wrong
-          setError('An unexpected error occurred. Please try again.');
+          setError('Failed to load dashboard data. Please try again later.');
         }
       } finally {
         setLoading(false);

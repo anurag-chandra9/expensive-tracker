@@ -131,6 +131,15 @@ const theme = createTheme({
   spacing: (factor) => `${0.5 * factor}rem`,
 });
 
+// Protected Route component
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('accessToken');
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
+
 function App() {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -141,10 +150,38 @@ function App() {
             <Navigation />
             <div style={{ flex: 1, padding: '20px' }}>
               <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/expenses" element={<ExpenseList />} />
-                <Route path="/add-expense" element={<AddExpense />} />
-                <Route path="/categories" element={<CategoryList />} />
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/expenses"
+                  element={
+                    <ProtectedRoute>
+                      <ExpenseList />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/add-expense"
+                  element={
+                    <ProtectedRoute>
+                      <AddExpense />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/categories"
+                  element={
+                    <ProtectedRoute>
+                      <CategoryList />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route path="/login" element={<Login />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
