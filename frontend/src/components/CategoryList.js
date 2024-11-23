@@ -21,6 +21,7 @@ import {
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import axios from 'axios';
+import config from '../config';
 
 function CategoryList() {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ function CategoryList() {
   const [loading, setLoading] = useState(false);
 
   const api = axios.create({
-    baseURL: 'http://localhost:8000/api',
+    baseURL: config.API_URL,
   });
 
   // Add request interceptor to include token

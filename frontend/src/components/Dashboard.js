@@ -40,6 +40,7 @@ import {
   Legend,
 } from 'recharts';
 import axios from 'axios';
+import config from '../config';
 
 const COLORS = [
   '#2196F3', // Blue
@@ -105,7 +106,7 @@ function Dashboard() {
   const [error, setError] = useState('');
 
   const api = axios.create({
-    baseURL: 'http://localhost:8000/api',
+    baseURL: config.API_URL,
   });
 
   api.interceptors.request.use(

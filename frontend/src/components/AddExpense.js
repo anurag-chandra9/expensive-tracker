@@ -30,6 +30,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import axios from 'axios';
+import config from '../config';
 
 function AddExpense() {
   const theme = useTheme();
@@ -47,7 +48,7 @@ function AddExpense() {
   const [errors, setErrors] = useState({});
 
   const api = axios.create({
-    baseURL: 'http://localhost:8000/api',
+    baseURL: config.API_URL,
   });
 
   api.interceptors.request.use(

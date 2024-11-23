@@ -31,6 +31,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
+import config from '../config';
 import { format } from 'date-fns';
 
 function ExpenseList() {
@@ -52,7 +53,7 @@ function ExpenseList() {
 
   // Create axios instance with authentication
   const api = axios.create({
-    baseURL: 'http://localhost:8000/api',
+    baseURL: config.API_URL,
     headers: getAuthHeader(),
   });
 

@@ -17,6 +17,7 @@ import {
   Link,
 } from '@mui/material';
 import axios from 'axios';
+import config from '../config';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -73,7 +74,7 @@ function Login() {
     setSuccess('');
 
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/login/', {
+      const response = await axios.post(`${config.API_URL}/api/auth/login/`, {
         username: formData.username,
         password: formData.password,
       });
@@ -107,7 +108,7 @@ function Login() {
     }
 
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/register/', {
+      const response = await axios.post(`${config.API_URL}/api/auth/register/`, {
         username: formData.username,
         password: formData.password,
         email: formData.email,
@@ -128,7 +129,7 @@ function Login() {
 
   const handleRequestOTP = async () => {
     try {
-      await axios.post('http://localhost:8000/api/auth/request-password-reset/', {
+      await axios.post(`${config.API_URL}/api/auth/request-password-reset/`, {
         email: resetEmail,
       });
       setOtpSent(true);
@@ -150,7 +151,7 @@ function Login() {
     }
 
     try {
-      await axios.post('http://localhost:8000/api/auth/verify-otp/', {
+      await axios.post(`${config.API_URL}/api/auth/verify-otp/`, {
         email: resetEmail,
         otp: otp,
         new_password: newPassword,
