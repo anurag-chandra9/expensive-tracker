@@ -100,6 +100,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
     'https://expensive-tracker-beta.vercel.app',
+    'https://expensive-tracker-go86blsx2-anurag-chandras-projects.vercel.app',
     'http://localhost:3000',
 ]
 CORS_ALLOW_CREDENTIALS = True
@@ -122,6 +123,10 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
+# For development
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
 
 # Logging configuration
 LOGGING = {
