@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { LocalizationProvider } from '@mui/x-date-pickers';
@@ -136,16 +136,20 @@ function App() {
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Router basename="/">
-          <Navigation />
-          <Routes>
-            <Route exact path="/" element={<Dashboard />} />
-            <Route exact path="/expenses" element={<ExpenseList />} />
-            <Route exact path="/add-expense" element={<AddExpense />} />
-            <Route exact path="/categories" element={<CategoryList />} />
-            <Route exact path="/login" element={<Login />} />
-            <Route path="*" element={<Dashboard />} />
-          </Routes>
+        <Router>
+          <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <Navigation />
+            <div style={{ flex: 1, padding: '20px' }}>
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/expenses" element={<ExpenseList />} />
+                <Route path="/add-expense" element={<AddExpense />} />
+                <Route path="/categories" element={<CategoryList />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </div>
+          </div>
         </Router>
       </ThemeProvider>
     </LocalizationProvider>
