@@ -136,14 +136,15 @@ function App() {
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Router>
+        <Router basename="/">
           <Navigation />
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/expenses" element={<ExpenseList />} />
-            <Route path="/add-expense" element={<AddExpense />} />
-            <Route path="/categories" element={<CategoryList />} />
-            <Route path="/login" element={<Login />} />
+            <Route exact path="/" element={<Dashboard />} />
+            <Route exact path="/expenses" element={<ExpenseList />} />
+            <Route exact path="/add-expense" element={<AddExpense />} />
+            <Route exact path="/categories" element={<CategoryList />} />
+            <Route exact path="/login" element={<Login />} />
+            <Route path="*" element={<Dashboard />} />
           </Routes>
         </Router>
       </ThemeProvider>
