@@ -98,13 +98,8 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS settings
-CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'https://expensive-tracker-beta.vercel.app',
-    'https://expensive-tracker-fl3pelmco-anurag-chandras-projects.vercel.app',
-    'https://expensive-tracker-git-main-anurag-chandras-projects.vercel.app',
-]
+CORS_ALLOW_ALL_ORIGINS = True  # Temporarily enable this for testing
+CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -127,12 +122,13 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
-CORS_EXPOSE_HEADERS = [
-    'content-type',
-    'content-length',
+# Temporarily allow all origins for testing
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',
+    'https://expensive-tracker-beta.vercel.app',
+    'https://expensive-tracker-fl3pelmco-anurag-chandras-projects.vercel.app',
 ]
-
-CORS_ALLOW_CREDENTIALS = True
 
 # Logging configuration
 LOGGING = {

@@ -16,11 +16,14 @@ const config = {
 // Configure axios defaults
 axios.defaults.baseURL = API_URL;
 axios.defaults.headers.common['Content-Type'] = 'application/json';
-axios.defaults.withCredentials = true;
+axios.defaults.withCredentials = false; // Disable credentials for now
 
 // Add request interceptor
 axios.interceptors.request.use(
   (config) => {
+    // Remove withCredentials for now
+    config.withCredentials = false;
+    
     const token = localStorage.getItem('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
