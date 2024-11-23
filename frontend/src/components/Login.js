@@ -16,7 +16,7 @@ import {
   DialogActions,
   Link,
 } from '@mui/material';
-import axios from 'axios';
+import axiosInstance from '../axiosInstance'; // Import the new axios instance
 import config from '../config';
 
 function TabPanel(props) {
@@ -76,23 +76,17 @@ function Login() {
     setSuccess('');
 
     try {
-      const response = await axios.post(`${config.API_URL}${config.API_ENDPOINTS.LOGIN}`, {
+      const response = await axiosInstance.post(config.API_ENDPOINTS.LOGIN, {
         username: formData.username,
         password: formData.password,
       });
 
       if (response.data.tokens) {
-        // Store tokens and user data
         localStorage.setItem('accessToken', response.data.tokens.access);
         localStorage.setItem('refreshToken', response.data.tokens.refresh);
         localStorage.setItem('user', JSON.stringify(response.data.user));
         
-        // Set Authorization header for future requests
-        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.tokens.access}`;
-
         setSuccess('Login successful! Redirecting...');
-        
-        // Redirect immediately
         navigate('/');
       } else {
         setError('Invalid response from server');
@@ -138,7 +132,7 @@ function Login() {
     }
 
     try {
-      const response = await axios.post(`${config.API_URL}${config.API_ENDPOINTS.REGISTER}`, {
+      const response = await axiosInstance.post(config.API_ENDPOINTS.REGISTER, {
         username: formData.username,
         email: formData.email,
         password: formData.password,
@@ -178,7 +172,7 @@ function Login() {
 
   const handleRequestOTP = async () => {
     try {
-      await axios.post(`${config.API_URL}/api/auth/request-password-reset/`, {
+      await axiosInstance.post(`${config.API_URL}/api/auth/request-password-reset/`, {
         email: resetEmail,
       });
       setOtpSent(true);
@@ -200,7 +194,7 @@ function Login() {
     }
 
     try {
-      await axios.post(`${config.API_URL}/api/auth/verify-otp/`, {
+      await axiosInstance.post(`${config.API_URL}/api/auth/verify-otp/`, {
         email: resetEmail,
         otp: otp,
         new_password: newPassword,
