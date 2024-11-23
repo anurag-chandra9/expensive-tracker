@@ -74,21 +74,26 @@ function Login() {
     setSuccess('');
 
     try {
-      const response = await axios.post(`${config.API_URL}/api/auth/login/`, {
+      const response = await axios.post(`${config.API_URL}${config.API_ENDPOINTS.LOGIN}`, {
         username: formData.username,
         password: formData.password,
       });
 
-      localStorage.setItem('accessToken', response.data.tokens.access);
-      localStorage.setItem('refreshToken', response.data.tokens.refresh);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      if (response.data.tokens) {
+        localStorage.setItem('accessToken', response.data.tokens.access);
+        localStorage.setItem('refreshToken', response.data.tokens.refresh);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
 
-      setSuccess('Login successful! Redirecting...');
-      setTimeout(() => {
-        navigate('/');
-      }, 1500);
+        setSuccess('Login successful! Redirecting...');
+        setTimeout(() => {
+          navigate('/');
+        }, 1500);
+      } else {
+        setError('Invalid response from server');
+      }
     } catch (error) {
-      setError(error.response?.data?.error || 'Login failed');
+      console.error('Login error:', error);
+      setError(error.response?.data?.error || 'Login failed. Please check your credentials.');
     }
   };
 
@@ -102,28 +107,26 @@ function Login() {
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
-      return;
-    }
-
     try {
-      const response = await axios.post(`${config.API_URL}/api/auth/register/`, {
+      const response = await axios.post(`${config.API_URL}${config.API_ENDPOINTS.REGISTER}`, {
         username: formData.username,
-        password: formData.password,
         email: formData.email,
+        password: formData.password,
       });
 
-      localStorage.setItem('accessToken', response.data.tokens.access);
-      localStorage.setItem('refreshToken', response.data.tokens.refresh);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-
-      setSuccess('Registration successful! Redirecting...');
-      setTimeout(() => {
-        navigate('/');
-      }, 1500);
+      if (response.data.message) {
+        setSuccess('Registration successful! Please login.');
+        setTabValue(0); // Switch to login tab
+        setFormData({
+          username: '',
+          password: '',
+          email: '',
+          confirmPassword: '',
+        });
+      }
     } catch (error) {
-      setError(error.response?.data?.error || 'Registration failed');
+      console.error('Registration error:', error);
+      setError(error.response?.data?.error || 'Registration failed. Please try again.');
     }
   };
 
