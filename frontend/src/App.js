@@ -10,6 +10,7 @@ import ExpenseList from './components/ExpenseList';
 import AddExpense from './components/AddExpense';
 import CategoryList from './components/CategoryList';
 import Login from './components/Login';
+import axios from 'axios'; // Import axios
 
 const theme = createTheme({
   palette: {
@@ -134,9 +135,23 @@ const theme = createTheme({
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('accessToken');
-  if (!token) {
+  const user = localStorage.getItem('user');
+
+  React.useEffect(() => {
+    // Set default authorization header
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
+  }, [token]);
+
+  if (!token || !user) {
+    // Clear any invalid data
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
     return <Navigate to="/login" replace />;
   }
+
   return children;
 };
 

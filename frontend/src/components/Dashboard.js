@@ -144,15 +144,27 @@ function Dashboard() {
           return;
         }
 
-        const response = await api.get('/api/expenses/dashboard/');
+        // Set authorization header
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+        const response = await api.get(config.API_ENDPOINTS.DASHBOARD);
+        
         if (response.data) {
-          setDashboardData(response.data);
+          setDashboardData({
+            total_expenses: response.data.total_expenses || 0,
+            monthly_expenses: response.data.monthly_expenses || 0,
+            category_expenses: response.data.category_expenses || [],
+            monthly_trend: response.data.monthly_trend || [],
+            recent_expenses: response.data.recent_expenses || []
+          });
         }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
-        if (error.response?.status === 401) {
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          // Clear invalid token
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
+          localStorage.removeItem('user');
           navigate('/login');
         } else {
           setError('Failed to load dashboard data. Please try again later.');

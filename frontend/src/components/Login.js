@@ -45,6 +45,7 @@ function Login() {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [errors, setErrors] = useState({});
   
   // Forgot password states
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
@@ -66,6 +67,7 @@ function Login() {
       ...prev,
       [name]: value
     }));
+    setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
   const handleLogin = async (e) => {
@@ -80,20 +82,30 @@ function Login() {
       });
 
       if (response.data.tokens) {
+        // Store tokens and user data
         localStorage.setItem('accessToken', response.data.tokens.access);
         localStorage.setItem('refreshToken', response.data.tokens.refresh);
         localStorage.setItem('user', JSON.stringify(response.data.user));
+        
+        // Set Authorization header for future requests
+        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.tokens.access}`;
 
         setSuccess('Login successful! Redirecting...');
-        setTimeout(() => {
-          navigate('/');
-        }, 1500);
+        
+        // Redirect immediately
+        navigate('/');
       } else {
         setError('Invalid response from server');
       }
     } catch (error) {
       console.error('Login error:', error);
-      setError(error.response?.data?.error || 'Login failed. Please check your credentials.');
+      if (error.response?.status === 401) {
+        setError('Invalid username or password');
+      } else if (error.response?.data?.error) {
+        setError(error.response.data.error);
+      } else {
+        setError('Login failed. Please try again.');
+      }
     }
   };
 
@@ -101,9 +113,27 @@ function Login() {
     e.preventDefault();
     setError('');
     setSuccess('');
+    setErrors({});
+
+    // Validate form data
+    const validationErrors = {};
+    if (!formData.username) validationErrors.username = 'Username is required';
+    if (!formData.email) validationErrors.email = 'Email is required';
+    if (!formData.password) validationErrors.password = 'Password is required';
+    if (!formData.confirmPassword) validationErrors.confirmPassword = 'Please confirm your password';
+    
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setErrors({ confirmPassword: 'Passwords do not match' });
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      setErrors({ password: 'Password must be at least 8 characters long' });
       return;
     }
 
@@ -114,19 +144,35 @@ function Login() {
         password: formData.password,
       });
 
-      if (response.data.message) {
-        setSuccess('Registration successful! Please login.');
-        setTabValue(0); // Switch to login tab
-        setFormData({
-          username: '',
-          password: '',
-          email: '',
-          confirmPassword: '',
-        });
+      if (response.data) {
+        setSuccess('Registration successful! Please login with your credentials.');
+        // Switch to login tab after a short delay
+        setTimeout(() => {
+          setTabValue(0);
+          // Clear registration form
+          setFormData({
+            username: '',
+            password: '',
+            email: '',
+            confirmPassword: '',
+          });
+        }, 1500);
       }
     } catch (error) {
       console.error('Registration error:', error);
-      setError(error.response?.data?.error || 'Registration failed. Please try again.');
+      if (error.response?.data?.username) {
+        setErrors({ username: error.response.data.username[0] });
+      } else if (error.response?.data?.email) {
+        setErrors({ email: error.response.data.email[0] });
+      } else if (error.response?.data?.password) {
+        setErrors({ password: error.response.data.password[0] });
+      } else if (error.response?.data?.error) {
+        setError(error.response.data.error);
+      } else if (error.response?.data?.detail) {
+        setError(error.response.data.detail);
+      } else {
+        setError('Registration failed. Please try again.');
+      }
     }
   };
 
@@ -247,6 +293,8 @@ function Login() {
               onChange={handleChange}
               margin="normal"
               required
+              error={!!errors.username}
+              helperText={errors.username}
             />
             <TextField
               fullWidth
@@ -257,6 +305,8 @@ function Login() {
               onChange={handleChange}
               margin="normal"
               required
+              error={!!errors.email}
+              helperText={errors.email}
             />
             <TextField
               fullWidth
@@ -267,6 +317,8 @@ function Login() {
               onChange={handleChange}
               margin="normal"
               required
+              error={!!errors.password}
+              helperText={errors.password}
             />
             <TextField
               fullWidth
@@ -277,6 +329,8 @@ function Login() {
               onChange={handleChange}
               margin="normal"
               required
+              error={!!errors.confirmPassword}
+              helperText={errors.confirmPassword}
             />
             <Button
               type="submit"
