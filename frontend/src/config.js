@@ -5,6 +5,7 @@ const config = {
     REGISTER: '/api/auth/register/',
     EXPENSES: '/api/expenses/',
     CATEGORIES: '/api/categories/',
+    DASHBOARD: '/api/expenses/dashboard/',
   },
   TOKEN_KEY: 'expense_tracker_token',
 };

@@ -55,9 +55,9 @@ function CategoryList() {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/categories/');
-      setCategories(response.data);
       setError('');
+      const response = await api.get(config.API_ENDPOINTS.CATEGORIES);
+      setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
       if (error.response?.status === 401) {
@@ -89,35 +89,103 @@ function CategoryList() {
     setError('');
   };
 
-  const handleSave = async () => {
-    if (!categoryName.trim()) {
-      setError('Category name is required');
-      return;
-    }
-
+  const handleAddCategory = async () => {
     try {
       setLoading(true);
-      if (dialogMode === 'add') {
-        await api.post('/categories/', { name: categoryName.trim() });
-        setSuccess('Category added successfully!');
-      } else {
-        await api.put(`/categories/${selectedCategory.id}/`, {
-          name: categoryName.trim(),
-        });
-        setSuccess('Category updated successfully!');
+      setError('');
+      
+      if (!categoryName.trim()) {
+        setError('Category name cannot be empty');
+        return;
       }
 
+      const response = await api.post(config.API_ENDPOINTS.CATEGORIES, {
+        name: categoryName.trim()
+      });
+
+      setCategories([...categories, response.data]);
+      setSuccess('Category added successfully!');
       handleCloseDialog();
-      await fetchCategories();
+      setCategoryName('');
     } catch (error) {
-      console.error('Error saving category:', error);
+      console.error('Error adding category:', error);
       if (error.response?.status === 401) {
         navigate('/login');
+      } else if (error.response?.data?.error) {
+        setError(error.response.data.error);
       } else {
-        setError(error.response?.data?.error || error.response?.data?.name?.[0] || 'Failed to save category. Please try again.');
+        setError('Failed to add category. Please try again.');
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUpdateCategory = async () => {
+    try {
+      setLoading(true);
+      setError('');
+
+      if (!categoryName.trim()) {
+        setError('Category name cannot be empty');
+        return;
+      }
+
+      const response = await api.put(`${config.API_ENDPOINTS.CATEGORIES}${selectedCategory.id}/`, {
+        name: categoryName.trim()
+      });
+
+      const updatedCategories = categories.map(cat =>
+        cat.id === selectedCategory.id ? response.data : cat
+      );
+      setCategories(updatedCategories);
+      setSuccess('Category updated successfully!');
+      handleCloseDialog();
+    } catch (error) {
+      console.error('Error updating category:', error);
+      if (error.response?.status === 401) {
+        navigate('/login');
+      } else if (error.response?.data?.error) {
+        setError(error.response.data.error);
+      } else {
+        setError('Failed to update category. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteCategory = async (categoryId) => {
+    try {
+      setLoading(true);
+      setError('');
+
+      await api.delete(`${config.API_ENDPOINTS.CATEGORIES}${categoryId}/`);
+      
+      const updatedCategories = categories.filter(cat => cat.id !== categoryId);
+      setCategories(updatedCategories);
+      setSuccess('Category deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      if (error.response?.status === 401) {
+        navigate('/login');
+      } else if (error.response?.status === 400) {
+        setError('Cannot delete category with associated expenses. Please delete or reassign expenses first.');
+      } else if (error.response?.data?.error) {
+        setError(error.response.data.error);
+      } else {
+        setError('Failed to delete category. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (dialogMode === 'add') {
+      await handleAddCategory();
+    } else {
+      await handleUpdateCategory();
     }
   };
 
@@ -126,21 +194,7 @@ function CategoryList() {
       return;
     }
 
-    try {
-      setLoading(true);
-      await api.delete(`/categories/${categoryId}/`);
-      setSuccess('Category deleted successfully!');
-      await fetchCategories();
-    } catch (error) {
-      console.error('Error deleting category:', error);
-      if (error.response?.status === 401) {
-        navigate('/login');
-      } else {
-        setError(error.response?.data?.error || 'Failed to delete category. Please try again.');
-      }
-    } finally {
-      setLoading(false);
-    }
+    await handleDeleteCategory(categoryId);
   };
 
   return (

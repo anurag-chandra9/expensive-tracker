@@ -69,7 +69,7 @@ function AddExpense() {
       try {
         setCategoryLoading(true);
         setError('');
-        const response = await api.get('/categories/');
+        const response = await api.get(config.API_ENDPOINTS.CATEGORIES);
         setCategories(response.data);
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -95,13 +95,18 @@ function AddExpense() {
 
     try {
       if (!formData.category) {
+        setErrors({ category: 'Please select a category' });
         throw new Error('Please select a category');
       }
 
-      const response = await api.post('/expenses/', {
-        ...formData,
+      const expenseData = {
+        amount: parseFloat(formData.amount),
+        description: formData.description,
         date: formData.date.toISOString().split('T')[0],
-      });
+        category: formData.category
+      };
+
+      const response = await api.post(config.API_ENDPOINTS.EXPENSES, expenseData);
 
       setSuccess('Expense added successfully!');
       setFormData({
@@ -110,23 +115,16 @@ function AddExpense() {
         date: new Date(),
         category: '',
       });
-
-      setTimeout(() => {
-        setSuccess('');
-      }, 5000);
     } catch (error) {
       console.error('Error adding expense:', error);
       if (error.response?.status === 401) {
         setError('Please log in to add expenses.');
-      } else if (error.response?.data?.detail) {
-        setError(error.response.data.detail);
+      } else if (error.response?.data?.error) {
+        setError(error.response.data.error);
       } else if (error.message) {
         setError(error.message);
       } else {
         setError('Failed to add expense. Please try again.');
-      }
-      if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
       }
     } finally {
       setLoading(false);
