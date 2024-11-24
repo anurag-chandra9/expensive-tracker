@@ -98,7 +98,11 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS settings
-CORS_ALLOW_ALL_ORIGINS = True  # Temporarily enable this for testing
+CORS_ALLOWED_ORIGINS = [
+    'https://expensive-tracker-beta.vercel.app',
+    'http://localhost:3000',
+]
+
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = [
@@ -122,13 +126,18 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
-# Temporarily allow all origins for testing
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000',
-    'https://expensive-tracker-beta.vercel.app',
-    'https://expensive-tracker-fl3pelmco-anurag-chandras-projects.vercel.app',
+CORS_EXPOSE_HEADERS = [
+    'content-type',
+    'content-length',
 ]
+
+# Security Settings
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = False  # Set to True in production
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # Logging configuration
 LOGGING = {
@@ -202,10 +211,3 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
-
-# Security settings
-SECURE_SSL_REDIRECT = not DEBUG
-SESSION_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_SECURE = not DEBUG
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
