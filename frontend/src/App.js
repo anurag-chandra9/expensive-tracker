@@ -11,6 +11,7 @@ import AddExpense from './components/AddExpense';
 import CategoryList from './components/CategoryList';
 import Login from './components/Login';
 import axios from 'axios'; // Import axios
+import api from './api'; // Import api
 
 const theme = createTheme({
   palette: {
@@ -140,7 +141,7 @@ const ProtectedRoute = ({ children }) => {
   React.useEffect(() => {
     // Set default authorization header
     if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
   }, [token]);
 
