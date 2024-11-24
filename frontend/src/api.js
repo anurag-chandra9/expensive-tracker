@@ -6,8 +6,9 @@ const api = axios.create({
   baseURL: config.API_URL,
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json',
   },
-  withCredentials: false,
+  withCredentials: true,  // Enable credentials
 });
 
 // Add request interceptor
@@ -20,6 +21,7 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
+    console.error('Request error:', error);
     return Promise.reject(error);
   }
 );
@@ -28,6 +30,8 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    console.error('Response error:', error);
+    
     if (error.response?.status === 401) {
       // Clear tokens and redirect to login
       localStorage.removeItem('accessToken');
