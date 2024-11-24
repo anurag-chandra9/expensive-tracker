@@ -8,12 +8,15 @@ const api = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-  withCredentials: true,  // Enable credentials
+  withCredentials: false, // Disable credentials for now
 });
 
 // Add request interceptor
 api.interceptors.request.use(
   (config) => {
+    // Add CORS headers
+    config.headers['Access-Control-Allow-Origin'] = '*';
+    
     const token = localStorage.getItem('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -30,7 +33,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    console.error('Response error:', error);
+    console.error('Response error:', error.response || error);
     
     if (error.response?.status === 401) {
       // Clear tokens and redirect to login

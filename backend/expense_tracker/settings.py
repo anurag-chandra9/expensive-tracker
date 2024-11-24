@@ -98,15 +98,9 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS settings
-CORS_ORIGIN_ALLOW_ALL = True  # For development only
-
-CORS_ALLOWED_ORIGINS = [
-    'https://expensive-tracker-git-main-anurag-chandras-projects.vercel.app',
-    'https://expensive-tracker-beta.vercel.app',
-    'http://localhost:3000',
-]
-
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -127,22 +121,34 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+    'access-control-allow-origin',
 ]
 
-# CSRF settings
-CSRF_TRUSTED_ORIGINS = [
-    'https://expensive-tracker-git-main-anurag-chandras-projects.vercel.app',
+# Set CORS_ORIGIN_WHITELIST if needed
+CORS_ORIGIN_WHITELIST = [
     'https://expensive-tracker-beta.vercel.app',
     'http://localhost:3000',
 ]
 
-# Security Settings
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# CORS middleware settings
+CORS_REPLACE_HTTPS_REFERER = True
+CORS_URLS_REGEX = r'^/api/.*$'
+
+# Security settings - disable for now to debug CORS
 SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
+CSRF_COOKIE_HTTPONLY = False
+CSRF_TRUSTED_ORIGINS = [
+    'https://expensive-tracker-beta.vercel.app',
+    'http://localhost:3000',
+]
+
+# Additional headers
+CORS_EXPOSE_HEADERS = [
+    'access-control-allow-origin',
+    'access-control-allow-credentials',
+]
 
 # Logging configuration
 LOGGING = {
