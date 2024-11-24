@@ -76,20 +76,18 @@ function Login() {
     setSuccess('');
 
     try {
+      console.log('Attempting login...');
       const response = await api.post(config.API_ENDPOINTS.LOGIN, {
         username: formData.username,
         password: formData.password,
       });
 
+      console.log('Login response:', response.data);
       if (response.data.tokens) {
-        // Store tokens and user data
         localStorage.setItem('accessToken', response.data.tokens.access);
         localStorage.setItem('refreshToken', response.data.tokens.refresh);
         localStorage.setItem('user', JSON.stringify(response.data.user));
         
-        // Set Authorization header for future requests
-        api.defaults.headers.common['Authorization'] = `Bearer ${response.data.tokens.access}`;
-
         setSuccess('Login successful! Redirecting...');
         navigate('/');
       } else {
@@ -97,10 +95,12 @@ function Login() {
       }
     } catch (error) {
       console.error('Login error:', error);
-      if (error.response?.status === 401) {
-        setError('Invalid username or password');
+      if (error.response?.data?.detail) {
+        setError(error.response.data.detail);
       } else if (error.response?.data?.error) {
         setError(error.response.data.error);
+      } else if (error.message) {
+        setError(error.message);
       } else {
         setError('Login failed. Please try again.');
       }
@@ -130,18 +130,15 @@ function Login() {
       return;
     }
 
-    if (formData.password.length < 8) {
-      setErrors({ password: 'Password must be at least 8 characters long' });
-      return;
-    }
-
     try {
+      console.log('Attempting registration...');
       const response = await api.post(config.API_ENDPOINTS.REGISTER, {
         username: formData.username,
         email: formData.email,
         password: formData.password,
       });
 
+      console.log('Registration response:', response.data);
       if (response.data) {
         setSuccess('Registration successful! Please login with your credentials.');
         setTimeout(() => {
@@ -166,6 +163,8 @@ function Login() {
         setError(error.response.data.error);
       } else if (error.response?.data?.detail) {
         setError(error.response.data.detail);
+      } else if (error.message) {
+        setError(error.message);
       } else {
         setError('Registration failed. Please try again.');
       }
